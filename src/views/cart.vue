@@ -5,7 +5,7 @@
                 <div class="item-name"></div>
                 <div class="item-price"></div>
                 <div class="buy-num">
-                    <div class="jian-btn" :class="[item.number==1?'disabled':'']" @click="jianBtnTap(index)">
+                    <div class="jian-btn" v-bind:class="[item.number==1?'disabled':'']" @click="jianBtnTap(index,item.number)">
                         -</div>
                     <input type="text" value="{{item.number}}" v-on:keyup="inputTargetValue" />
                     <div class="jia-btn" @click="jiaBtnTap(index)">+
@@ -15,7 +15,7 @@
         </div>.
         <div class="footer">
             <div class="totalprice"></div>
-            <div class="submit">提交</div>
+            <div class="submit" @click='submit'>提交</div>
         </div>
     </div>
 </template>
@@ -24,7 +24,9 @@
         name: 'cart',
         data: {
 
+            return({
 
+            })
         },
         methods: {
             //数量减
@@ -36,8 +38,12 @@
 
             }
         },
+        //获取输入框值
         inputTargetValue: function (e) {
             console.log(e.target.value);
+        },
+        submit:function(){
+            
         }
     }
 
