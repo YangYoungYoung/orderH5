@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import order from '@/views/order'
+import center from '@/views/center'
 Vue.use(Router)
 
 export default new Router({
 routes: [
 {
 path: '/',
-name: 'order',
-component: order,
-}
+name: 'center',
+component: center,
+} 
 ]
 })
