@@ -23,11 +23,11 @@
             <div class="bottom-list">
                 <div class="member-data">
                     <div class="data-name">会员资料</div>
-                    <div class="data-info">详情></div>
+                    <div class="data-info">详情 ></div>
                 </div>
                 <div class="member-data">
-                    <div class="data-name">会员资料</div>
-                    <div class="data-info">详情></div>
+                    <div class="data-name">消费记录</div>
+                    <div class="data-info">></div>
                 </div>
             </div>
         </div>

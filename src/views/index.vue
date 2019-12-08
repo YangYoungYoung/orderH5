@@ -38,8 +38,6 @@
   </div>
 </template>
 <script type="text/javascript">
-  import https from '../https.js'
-  import vue from 'vue'
   import order from '../assets/order.png'
   import status from '../assets/status.png'
   import form from '../assets/form.png'
@@ -47,6 +45,9 @@
   import feedback from '../assets/feedback.png'
   import info1 from '../assets/1.jpg'
   import info2 from '../assets/2.jpg'
+  import Vue from 'vue'
+  import axios from 'axios'
+  Vue.prototype.axios = axios
   export default {
     name: 'hi',
     data() {
@@ -58,12 +59,35 @@
           { ul: member, name: '会员' },
           { ul: feedback, name: '反馈' }
         ],
-        imgArr:[
-          {ul:info1},
-          {ul:info2}
+        imgArr: [
+          { ul: info1 },
+          { ul: info2 }
         ]
       }
-    }
+    },
+    created() {
+      this.getData();
+    },
+    methods: {
+      getData: function () {
+        //   this.$fetch('/shop/shopDetails')
+        // .then((response) => {
+        //   console.log(response)
+        // })
+        axios({
+          url: `${this.baseUrl}/shop/shopDetails`,
+          method: 'get',
+          headers: {
+            Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+            Accept: 'application/json'
+          }
+        }).then(res => {
+          console.log(res, 'res')
+        }).catch(res1 => {
+          console.log(res1, 'res1')
+        })
+      }
+    },
   }
 </script>
 <style>
@@ -157,17 +181,19 @@
     margin-top: 0.83rem;
     text-align: center;
   }
-  .info-img{
+
+  .info-img {
     margin-top: 0.68rem;
     width: 100%;
-    display:flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 0.68rem;
   }
-.img-item{
-  border-radius: 10px;
-  width:18.08rem;
-  height: 9.33rem;
-}
+
+  .img-item {
+    border-radius: 10px;
+    width: 18.08rem;
+    height: 9.33rem;
+  }
 </style>
