@@ -20,7 +20,7 @@ Vue.prototype.$put=put;
 
 Vue.prototype.$axios = axios
 Vue.prototype.qs = qs
-
+Vue.prototype.HOST= '/flask-api'
 Vue.prototype.baseUrl= process.env.API_ROOT
 /* eslint-disable no-new */
 new Vue({

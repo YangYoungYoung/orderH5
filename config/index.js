@@ -9,14 +9,18 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    autoOpenBrowser: true,  //运行npm run dev 打开浏览器
+    errorOverlay: true,
+    notifyOnErrors: true,
+    host: 'localhost',
     proxyTable: {
-      "/api": {
-        target: "http://192.168.5.141:8080",
-        changeOrigin: true,
+      '/api': {//前端路由匹配模式
+        target: 'http://ianjpu.natappfree.cc',  //后端请求服务域名和端口
+        changeOrigin: true,   //设置请求头
         pathRewrite: {
-          '^/api': ''
-        }
-}
+            '^/api': 'http://ianjpu.natappfree.cc'   //路径重写  前端/flask-api 对应 后端/
+        },
+    }
     },
 
     // Various Dev Server settings

@@ -72,20 +72,32 @@
       getData: function () {
         //   this.$fetch('/shop/shopDetails')
         // .then((response) => {
-        //   console.log(response)
+        console.log('======================', this.HOST)
         // })
-        axios({
-          url: `${this.baseUrl}/shop/shopDetails`,
-          method: 'get',
-          headers: {
-            Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
-            Accept: 'application/json'
+        this.$axios.get('/api/test/ce', {
+          params: {
+            test: '1234'
           }
         }).then(res => {
           console.log(res, 'res')
         }).catch(res1 => {
           console.log(res1, 'res1')
         })
+        // axios({
+        //   // url: `${this.baseUrl}/shop/shopDetails`,
+        //   url: '/api/shop/shopDetails',
+        //   method: 'get',
+        //   headers: {
+        //     Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+        //     Accept: 'application/json'
+        //   }
+        // }).then(res => {
+        //   console.log(res, 'res')
+        // }).catch(res1 => {
+        //   console.log(res1, 'res1')
+
+        
+        // })
       }
     },
   }
