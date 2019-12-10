@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import details from '@/views/details'
+import index from '@/views/index'
 Vue.use(Router)
 
 export default new Router({
 routes: [
 {
 path: '/',
-name: 'details',
-component: details,
+name: 'index',
+component: index,
 } 
 ]
 })

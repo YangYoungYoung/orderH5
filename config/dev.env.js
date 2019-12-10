@@ -4,5 +4,5 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_ROOT: '"http://ianjpu.natappfree.cc"'
+  API_ROOT: '"http://order.utools.club"'
 })

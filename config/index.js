@@ -15,10 +15,10 @@ module.exports = {
     host: 'localhost',
     proxyTable: {
       '/api': {//前端路由匹配模式
-        target: 'http://ianjpu.natappfree.cc',  //后端请求服务域名和端口
+        target: 'http://order.utools.club',  //后端请求服务域名和端口
         changeOrigin: true,   //设置请求头
         pathRewrite: {
-            '^/api': 'http://ianjpu.natappfree.cc'   //路径重写  前端/flask-api 对应 后端/
+            '^/api': 'http://order.utools.club'   //路径重写  前端/flask-api 对应 后端/
         },
     }
     },
