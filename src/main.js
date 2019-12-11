@@ -20,8 +20,14 @@ Vue.prototype.$put=put;
 
 Vue.prototype.$axios = axios
 Vue.prototype.qs = qs
-Vue.prototype.HOST= '/flask-api'
-Vue.prototype.baseUrl= process.env.API_ROOT
+router.beforeEach((to, from, next) => {
+  /* 路由发生变化修改页面title */
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  next()
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

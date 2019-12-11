@@ -1,18 +1,18 @@
 <template>
   <div id="hi">
     <mt-swipe style="height: 8.95rem;" :auto="4000">
-      <mt-swipe-item>
-        <img class="banner" src="../assets/1.jpg">
+      <mt-swipe-item v-for="(item, index) in banner" :key="index">
+        <img class="banner" v-bind:src="item">
       </mt-swipe-item>
-      <mt-swipe-item>
+      <!-- <mt-swipe-item>
         <img class="banner" src="../assets/2.jpg">
       </mt-swipe-item>
       <mt-swipe-item>
         <img class="banner" src="../assets/logo.png">
-      </mt-swipe-item>
+      </mt-swipe-item> -->
     </mt-swipe>
     <div class="menu">
-      <div class="menu-item" v-for="(item, index) in menuArr" :key="index">
+      <div class="menu-item" v-for="(item, index) in menuArr" :key="index" @click="toMenus(index)">
         <img class="menu-img" v-bind:src="item.ul">
         <div class="menu-name">{{item.name}}</div>
       </div>
@@ -21,18 +21,18 @@
       <div class="shop-wifi-number">
         <div class="wifi">
           <img class="wifi-img" src="../assets/wifi.png">
-          <div class="shop-address">123132123</div>
+          <div class="shop-address">{{phone}}</div>
         </div>
         <div class="wifi">
           <img class="wifi-img" src="../assets/phone.png">
-          <div class="shop-wifi">1321321</div>
+          <div class="shop-wifi">{{wifi}}</div>
         </div>
       </div>
     </div>
     <div class="shopInfo">
       <div class="title">店铺展示</div>
-      <div class="info-img" v-for="(item, index) in imgArr" :key="index">
-        <img class="img-item" v-bind:src="item.ul">
+      <div class="info-img" v-for="(item, index) in detailImg" :key="index">
+        <img class="img-item" v-bind:src="item">
       </div>
     </div>
   </div>
@@ -43,11 +43,8 @@
   import form from '../assets/form.png'
   import member from '../assets/member.png'
   import feedback from '../assets/feedback.png'
-  import info1 from '../assets/1.jpg'
-  import info2 from '../assets/2.jpg'
-  import Vue from 'vue'
   import axios from 'axios'
-  Vue.prototype.axios = axios
+
   export default {
     name: 'hi',
     data() {
@@ -59,18 +56,24 @@
           { ul: member, name: '会员' },
           { ul: feedback, name: '反馈' }
         ],
-        imgArr: [
-          { ul: info1 },
-          { ul: info2 }
-        ]
+        // imgArr: [
+        //   { ul: info1 },
+        //   { ul: info2 }
+        // ],
+        banner: [],
+        detailImg: [],
+        phone: '',
+        wifi: ''
       }
     },
     created() {
       this.getData();
+      // sessionStorage.setItem('shopId',shopId);
+      // sessionStorage.setItem('tableId',tableId); 
     },
     methods: {
       getData: function () {
-      
+
         // this.$axios.get('/api/test/ce', {
         //   params: {
         //     test: '1234'
@@ -81,11 +84,11 @@
         //   console.log(res1, 'res1')
         // })
         axios({
-          url: '/api/test/ce',
-          // url: '/api/shop/shopDetails',
+          // url: '/api/test/ce',
+          url: '/api/shop/shopDetails',
           method: 'get',
-          params:{
-            test:'456'
+          params: {
+            shopId: '1'
           },
           headers: {
             // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
@@ -93,13 +96,45 @@
           }
         }).then(res => {
           console.log(res, 'res')
+          const phone = res.data.data.phone;
+          this.phone = phone;
+          const wifi = res.data.data.wifi;
+          this.wifi = wifi;
+          this.banner = res.data.data.banner;
+          this.detailImg = res.data.data.details;
         }).catch(res1 => {
           console.log(res1, 'res1')
-
-
         })
+      },
+      toMenus(index) {
+        console.log('index is:', index);
+        switch (index) {
+          case 0:
+            // this.$router.push({path:'/order',params:{shopId:1}})
+            this.$router.push({
+              name: 'order',
+              query: {
+                shopId: 1,
+              }}).catch(err => { 
+                console.log('跳转失败：',err);
+              })
+            break;
+          case 1:
+            this.$router.push({ path: '/schedule' })
+            break;
+          case 2:
+            this.$router.push({ path: '/form' })
+            break;
+          case 3:
+            this.$router.push({ path: '/center' })
+            break;
+          case 4:
+            this.$router.push({ path: '/feedback' })
+            break;
+        }
       }
     },
+
   }
 </script>
 <style>

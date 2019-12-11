@@ -2,47 +2,41 @@
     <div id="container">
         <div class="good">
             <div class="shop-left">
-                <div class="type-item" v-for="(item, index) in typeArr" :key="index"
-                    :style="{'background-color': (item.select ? '#fff':'#eee')}">
-                    <div class="type-item-text">{{item.name}}</div>
+                <div class="type-item" v-for="(item, index) in goodArr" :key="index"
+                    :style="{'background-color': (item.selected ? '#fff':'#eee')}" @click='itemSelect(index)'>
+                    <div class="type-item-text">{{item.dishType}}</div>
                 </div>
             </div>
-            <div class="good-right" style="height: 400px; overflow-y:scroll">
-                <div class="good-list" v-for="(product, index) in productList" :key="index">
-                    <div class="right-title"></div>
-                    <div class="good-item" v-for="(good, index) in product.goods" :key="index">
-                        <div class="good-left">
-                            <img v-bind:src="good.img" class="good-img" alt="商品图片">
-                            <div class="good-info">
-                                <div class="good-name">{{good.name}}</div>
-                                <div class="good-member-price">{{good.memberPrice}}</div>
-                                <div class="good-price">{{good.price}}</div>
-                            </div>
-                        </div>
-                        <!--cartControl-->
-                        <div class="cartControl-wrapper">
-                            <div class="cartControl">
-                                <div name="fade">
-                                    <div class="cart-decrease" wx:if="{{productList.number > 0}}"
-                                        data-item-index="{{index}}" data-parentIndex="{{parentIndex}}"
-                                        catchtap="decreaseCart">
-                                        <div class="inner iconfont icon-jian" style="font-size:0.72rem;color:#fada85;">
-                                        </div>
-                                    </div>
-                                    <div class="cart-count" wx:if="{{productList.number > 0 }}">{{productList.number}}
-                                    </div>
-                                    <div class=" iconfont icon-jia cart-add " style="color:#fada85; "
-                                        data-item-index="{{index}}" data-parentIndex="{{parentIndex}}"
-                                        catchtap="addCart"></div>
+            <!-- <template v-if='goodArr.length>0'> -->
+            <div class="good-right" style="height: 90%; overflow-y:scroll">
+                <div class="good-list" v-for="(product, parentIndex) in goodArr" :key="parentIndex">
+                    <div class="right-title-view" :id='order(parentIndex)'>
+                        <div class="right-title">{{product.dishType}}</div>
+                    </div>
+                    <!-- <template v-if='product.dish'> -->
+                    <div class="good-item" v-for="(good, index) in product.dish" :key="index">
+                        <img v-bind:src="good.dishImage" class="good-img" alt="商品图片">
+                        <div class="good-info">
+                            <div class="good-name">{{good.dishName}}</div>
+                            <div class="info-bottom">
+                                <div class="good-price">￥{{good.price}}</div>
+                                <div class="good-number-control">
+                                    <img src="../assets/subtract_icon.png" class="subtract-icon" v-if='good.number>0'
+                                        @click='subtractTo(index,parentIndex)'>
+                                    <div class="good-number" v-if='good.number>0'>{{good.number}}</div>
+                                    <img src="../assets/add_icon.png" class="subtract-icon" style="margin-right:0rem"
+                                        @click='addTo(index,parentIndex)'>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- </template> -->
                 </div>
             </div>
+            <!-- </template> -->
         </div>
         <!--shopCart-->
-        <div class="shopCart">
+        <!-- <div class="shopCart">
             <div class="content">
                 <div class="content-left">
                     <div class="logo-wrapper">
@@ -59,22 +53,134 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 <script type="text/javascript">
-
+    import axios from 'axios'
     export default {
         name: 'container',
         data() {
             return {
-                typeArr: [
-                    { name: '会员折扣0', select: true },
-                    { name: '会员折扣1', select: false },
-                    { name: '会员折扣2', select: false },
-                    { name: '会员折扣3', select: false },
-                ]
+                goodArr: [],
+                totalCount: 0,
+                totalPrice: 0
             }
+        },
+        created() {
+            console.log('into order...............');
+            this.getAll();
+        },
+        methods: {
+            getAll: function () {
+                axios({
+                    url: '/api/menu/selectAll',
+                    method: 'get',
+                    params: {
+                        shopId: '1'
+                    },
+                    headers: {
+                        // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+                        Accept: 'application/json'
+                    }
+                }).then(res => {
+
+                    const goodArr = res.data.data;
+                    goodArr.forEach(item => {
+                        item.selected = false;
+                        item.dish.forEach(items => {
+                            items.number = 0;
+                        })
+                    })
+                    goodArr[0].selected = true;
+                    console.log('goodArr-======', goodArr);
+                    this.goodArr = goodArr;
+
+                }).catch(res1 => {
+                    console.log(res1, 'res1')
+                })
+            },
+            itemSelect(index) {
+                const goodArr = this.goodArr;
+                goodArr.forEach(item => {
+                    item.selected = false;
+                })
+                goodArr[index].selected = true;
+                console.log('goodArr-======', goodArr);
+                this.goodArr = goodArr;
+                const scrollTo = this.order(index);
+                console.log('scrollTo:', scrollTo);
+                document.getElementById(scrollTo).scrollIntoView();
+            },
+            order: function (parentIndex) {
+                return 'order' + parentIndex;
+            },
+            subtractTo: function (index, parentIndex) {
+                const shopId = sessionStorage.getItem('shopId');
+                const tableId = sessionStorage.getItem('tableId');
+                let totalCount = this.totalCount;
+                let goodArr = this.goodArr;
+                goodArr[parentIndex].dish[index].number++;
+                let dishId = goodArr[parentIndex].dish[index].iftId;
+                let dishName = goodArr[parentIndex].dish[index].dishName;
+                let dishImage = goodArr[parentIndex].dish[index].dishImage;
+                let number = goodArr[parentIndex].dish[index].number;
+                let dishPrice = goodArr[parentIndex].dish[index].dishPrice;
+                totalCount++;
+                axios({
+                    url: '/api/menu/selectAll',
+                    method: 'get',
+                    params: {
+                        shopId: shopId,
+                        tableId: tableId,
+                        dishId: iftId,
+                        dishName: dishName,
+                        dishImage: dishImage,
+                        number: number,
+                        dishPrice: dishPrice
+                    },
+                    headers: {
+                        // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+                        Accept: 'application/json'
+                    }
+                }).then(res => {
+                    console.log('数量加======', res);
+                    this.totalCount = totalCount;
+                    this.goodArr = goodArr;
+
+                }).catch(res1 => {
+                    console.log(res1, 'res1')
+                })
+            },
+            addTo: function () {
+                const shopId = sessionStorage.getItem('shopId');
+                const tableId = sessionStorage.getItem('tableId');
+                let totalCount = this.totalCount;
+                let goodArr = this.goodArr;
+                goodArr[parentIndex].dish[index].number--;
+                let dishId = goodArr[parentIndex].dish[index].iftId;
+                totalCount--;
+                axios({
+                    url: '/api/menu/selectAll',
+                    method: 'get',
+                    params: {
+                        shopId: shopId,
+                        tableId: tableId,
+                        dishId: iftId,
+                    },
+                    headers: {
+                        // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+                        Accept: 'application/json'
+                    }
+                }).then(res => {
+                    console.log('数量减---------', res);
+                    this.totalCount = totalCount;
+                    this.goodArr = goodArr;
+                }).catch(res1 => {
+                    console.log(res1, 'res1')
+                })
+            }
+
         }
     }
 </script>
@@ -99,7 +205,7 @@
     }
 
     .shop-left {
-        width: 3.97rem;
+        width: 4rem;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -111,12 +217,13 @@
         height: 1.97rem;
         display: flex;
         flex-direction: column;
-        font-size: 0.64rem;
+        font-size: 0.7rem;
         color: #5c5d5f;
         text-align: center;
         align-items: center;
         vertical-align: middle;
         line-height: 1.97rem;
+        border-bottom: 1px solid #fff;
 
     }
 
@@ -138,13 +245,25 @@
 
     .good-list {
         display: flex;
+        width: 100%;
         flex-direction: column;
         align-items: center;
     }
 
-    .right-title {
-        font-size: 0.4rem;
+    .right-title-view {
+        background-color: #eee;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
     }
+
+    .right-title {
+        font-size: 0.9rem;
+        padding: 0.3rem 0 0.3rem 1rem;
+        /* text-align: left; */
+    }
+
+
 
     .good-item {
         width: 15rem;
@@ -152,7 +271,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-
+        margin: 0.4rem 0;
     }
 
     .good-left {
@@ -168,91 +287,54 @@
     }
 
     .good-info {
+        flex: 1;
         display: flex;
         flex-direction: column;
         margin-left: 0.43rem;
+        height: 4rem;
+        justify-content: space-between;
+    }
+
+    .good-price {
+        color: #e86458;
+        text-align: left;
+    }
+
+    .info-bottom {
+        height: 1.6rem;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .good-name {
+        text-align: left;
         font-size: 0.9rem;
         color: #2b2b2b;
     }
 
-    /* cartControl 样式 */
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl {
-        font-size: 0;
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add {
-        display: inline-block;
-        padding: 0.43rem 0.64rem 0.64rem 0.64rem;
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add :fade-enter-active,
-    :fade-leave-active {
-        transition: all 0.4s linear;
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add :fade-enter,
-    :fade-leave-active {
-        opacity: 0 transform translate3d(2.56rem, 0, 0);
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add .inner {
-        display: inline-block;
-        line-height: 2.56rem;
-        font-size: 2.56rem;
-        vertical-align: top;
-        color: rgb(0, 160, 220, 0.2);
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add :inner-enter-active,
-    :inner-leave-active {
-        transition: all 0.4s linear;
-        transform: rotate(0);
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-decrease,
-    .cart-add :inner-enter,
-    :inner-leave-active {
-        opacity: 0 transform rotate(180deg);
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-count {
-        display: inline-block;
-        font-size: 1.07rem;
-        line-height: 2.56rem;
-        width: 1.28rem;
-        vertical-align: top;
-        padding-top: 0.64rem;
-        text-align: center;
-        color: rgb(147, 153, 159);
-    }
-
-    .goods .foods-wrapper .food-list .food-item .content .cartControl-wrapper .cartControl .cart-add {
-        display: inline-block;
-        padding: 0.64rem;
-        line-height: 2.56rem;
-        font-size: 2.56rem;
-        vertical-align: top;
-        color: rgb(0, 160, 220, 0.2);
-    }
-
-    .footer {
+    .good-number-control {
         display: flex;
         flex-direction: row;
-        width: 100%;
-        height: 2.67rem;
-        background-color: #eee;
         align-items: center;
-        justify-content: space-between;
+
     }
+
+    .subtract-icon {
+        width: 1.06rem;
+        height: 1.06rem;
+        box-sizing: border-box;
+    }
+
+    .good-number {
+        margin-left: 0.32rem;
+        margin-right: 0.32rem;
+        color: #999999;
+        font-size: 0.9rem;
+    }
+
 
     /* shopcart 样式 */
 
