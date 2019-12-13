@@ -115,21 +115,51 @@
               name: 'order',
               query: {
                 shopId: 1,
+              }
+            }).catch(err => {
+              console.log('跳转失败：', err);
+            })
+            break;
+          case 1:
+            this.$router.push({
+              name: 'schedule',
+              query: {
+                shopId: 1,
+              }
+            }).catch(err => {
+              console.log('跳转失败：', err);
+            })
+
+            break;
+          case 2:
+            this.$router.push({
+              name: 'form',
+              query: {
+                shopId: 1,
+              }
+            }).catch(err => {
+              console.log('跳转失败：', err);
+            })
+
+            break;
+          case 3:
+            this.$router.push({
+              name: 'center',
+              query: {
+                shopId: 1,
+              }
+            }).catch(err => {
+              console.log('跳转失败：', err);
+            })
+            break;
+          case 4:
+          this.$router.push({
+              name: 'feedback',
+              query: {
+                shopId: 1,
               }}).catch(err => { 
                 console.log('跳转失败：',err);
               })
-            break;
-          case 1:
-            this.$router.push({ path: '/schedule' })
-            break;
-          case 2:
-            this.$router.push({ path: '/form' })
-            break;
-          case 3:
-            this.$router.push({ path: '/center' })
-            break;
-          case 4:
-            this.$router.push({ path: '/feedback' })
             break;
         }
       }

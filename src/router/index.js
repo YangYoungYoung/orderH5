@@ -2,6 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import index from '@/views/index'
 import order from '@/views/order'
+import cart from '@/views/cart'
+import schedule from '@/views/schedule'
+import form from '@/views/form'
+import register from '@/views/register'
 Vue.use(Router)
 /**
  * 重写路由的push方法
@@ -12,6 +16,14 @@ Router.prototype.push = function push(location) {
 }
 export default new Router({
 routes: [
+    {
+        path: '/',
+        name: 'register',
+        component: register,
+        meta: {
+        title: '登录注册'
+        }
+    },
     {
         path: '/',
         name: 'index',
@@ -27,6 +39,31 @@ routes: [
         meta: {
         title: '点餐'
         }
+    },
+    {
+        path: '/',
+        name: 'cart',
+        component: cart,
+        meta: {
+        title: '购物车'
+        }
+    },
+    {
+        path: '/',
+        name: 'schedule',
+        component: schedule,
+        meta: {
+        title: '购物车'
+        }
+    },
+    {
+        path: '/',
+        name: 'form',
+        component: form,
+        meta: {
+        title: '支付'
+        }
     }
+    
 ]
 })

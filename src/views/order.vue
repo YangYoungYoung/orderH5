@@ -36,24 +36,27 @@
             <!-- </template> -->
         </div>
         <!--shopCart-->
-        <!-- <div class="shopCart">
+        <div class="shopCart">
             <div class="content">
                 <div class="content-left">
-                    <div class="logo-wrapper">
-                        <div class="logo highlight" bindtap='toCart'>
-                            <div class="iconfont icon-gouwuche highlight"></div>
-                        </div>
-                        <div class="num" wx:if="{{totalCount> 0}}">{{totalCount}}</div>
+                    <!-- <div class="logo-wrapper"> -->
+                    <div class="logo-cart" @click='toCart'>
+                        <!-- <div class="logo highlight" bindtap='toCart'> -->
+                        <img src="../assets/cart_logo.png" class="cart-logo">
+                        <!-- <div class="iconfont icon-gouwuche highlight"></div> -->
+                        <!-- </div> -->
+                        <div class="num" v-if="totalCount> 0">{{totalCount}}</div>
                     </div>
-                    <div class="price highlight">￥{{totalPrice}}</div>
+                    <!-- </div> -->
+                    <div class="highlight" style="margin-left: 1rem;">￥{{totalPrice}}</div>
                 </div>
-                <div class="content-right" catchtap="toCart">
-                    <div class="pay enough" :class="payClass">
+                <div class="content-right" >
+                    <div class="pay enough" @click='toCart'>
                         提交
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </template>
 <script type="text/javascript">
@@ -115,9 +118,11 @@
             order: function (parentIndex) {
                 return 'order' + parentIndex;
             },
-            subtractTo: function (index, parentIndex) {
-                const shopId = sessionStorage.getItem('shopId');
-                const tableId = sessionStorage.getItem('tableId');
+            //数量加
+            addTo: function (index, parentIndex) {
+                console.log('菜品数量加。。。。。');
+                // const shopId = sessionStorage.getItem('shopId');
+                // const tableId = sessionStorage.getItem('tableId');
                 let totalCount = this.totalCount;
                 let goodArr = this.goodArr;
                 goodArr[parentIndex].dish[index].number++;
@@ -125,15 +130,18 @@
                 let dishName = goodArr[parentIndex].dish[index].dishName;
                 let dishImage = goodArr[parentIndex].dish[index].dishImage;
                 let number = goodArr[parentIndex].dish[index].number;
-                let dishPrice = goodArr[parentIndex].dish[index].dishPrice;
+                let dishPrice = goodArr[parentIndex].dish[index].price;
                 totalCount++;
+                this.totalCount = totalCount;
                 axios({
-                    url: '/api/menu/selectAll',
-                    method: 'get',
+                    url: '/api/cart/add',
+                    method: 'post',
                     params: {
-                        shopId: shopId,
-                        tableId: tableId,
-                        dishId: iftId,
+                        // shopId: shopId,
+                        // tableId: tableId,
+                        shopId: 1,
+                        tableId: 1,
+                        dishId: dishId,
                         dishName: dishName,
                         dishImage: dishImage,
                         number: number,
@@ -147,26 +155,32 @@
                     console.log('数量加======', res);
                     this.totalCount = totalCount;
                     this.goodArr = goodArr;
-
+                    // this.totalCount = res.data.data.totalCount;
+                    this.totalPrice = res.data.data.totalPrice;
                 }).catch(res1 => {
                     console.log(res1, 'res1')
                 })
             },
-            addTo: function () {
-                const shopId = sessionStorage.getItem('shopId');
-                const tableId = sessionStorage.getItem('tableId');
+            //数量减
+            subtractTo: function (index, parentIndex) {
+                console.log('菜品数量减。。。。。');
+                // const shopId = sessionStorage.getItem('shopId');
+                // const tableId = sessionStorage.getItem('tableId');
                 let totalCount = this.totalCount;
                 let goodArr = this.goodArr;
                 goodArr[parentIndex].dish[index].number--;
                 let dishId = goodArr[parentIndex].dish[index].iftId;
                 totalCount--;
+                this.totalCount = totalCount;
                 axios({
-                    url: '/api/menu/selectAll',
-                    method: 'get',
+                    url: '/api/cart/reduceNumber',
+                    method: 'post',
                     params: {
-                        shopId: shopId,
-                        tableId: tableId,
-                        dishId: iftId,
+                        // shopId: shopId,
+                        // tableId: tableId,
+                        shopId: 1,
+                        tableId: 1,
+                        dishId: dishId,
                     },
                     headers: {
                         // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
@@ -176,11 +190,24 @@
                     console.log('数量减---------', res);
                     this.totalCount = totalCount;
                     this.goodArr = goodArr;
+                    // this.totalCount = res.data.data.totalCount;
+                    this.totalPrice = res.data.data.totalPrice;
                 }).catch(res1 => {
                     console.log(res1, 'res1')
                 })
+            },
+            toCart: function () {
+                console.log('跳转到购物车....');
+                this.$router.push({
+                    name: 'cart',
+                    query: {
+                        table: 1,
+                    }
+                    
+                }).catch(err => {
+                    console.log('跳转失败：', err);
+                })
             }
-
         }
     }
 </script>
@@ -271,7 +298,8 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin: 0.4rem 0;
+        padding: 0.4rem 0;
+        border-bottom: solid 1px #eee;
     }
 
     .good-left {
@@ -340,53 +368,74 @@
 
     .shopCart {
         position: fixed;
-        left: 0rpx;
-        bottom: 0rpx;
-        z-index: 50;
+        /* left: 0; */
+        bottom: 0;
+        z-index: 999;
         width: 100%;
-        height: 96rpx;
+        height: 2.56rem;
     }
 
     .shopCart .content {
         display: flex;
-        background: #141d27;
+        background: #eee;
     }
 
     .shopCart .content .content-left {
         flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 
-    .shopCart .content .content-left .logo-wrapper {
+    /* .shopCart .content .content-left .logo-wrapper {
         display: inline-block;
         position: relative;
-        top: -20rpx;
-        margin: 0 24rpx;
-        padding: 12rpx;
-        width: 112rpx;
-        height: 112rpx;
+        top: -0.53rem;
+        margin: 0 0.64rem;
+        padding: 2.93rem;
+        width: 2.98rem;
+        height: 2.98rem;
         box-sizing: border-box;
         vertical-align: top;
         border-radius: 50%;
         background: #141d27;
+    } */
+
+    .logo-cart {
+        width: 2.53rem;
+        height: 2.56rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: 1.44rem;
     }
 
-    .shopCart .content .content-left .logo-wrapper .num {
+    .cart-logo {
+        width: 2.21rem;
+        height: 2.21rem;
+        background-color: #e60012;
+        border-radius: 50%;
+        /* line-height:2.56rem; */
+    }
+
+    .logo-cart .num {
         position: absolute;
         top: 0;
-        right: 0;
-        width: 48rpx;
-        height: 48rpx;
-        line-height: 48rpx;
+        /* right: 0; */
+        left: 3.17rem;
+        width: 1.28rem;
+        height: 1.28rem;
+        line-height: 1.28rem;
         text-align: center;
-        border-radius: 32rpx;
-        font-size: 18rpx;
+        border-radius: 0.85rem;
+        font-size: 0.48rem;
         font-weight: 700;
         color: #fff;
         background: rgb(240, 20, 20);
-        box-shadow: 0 8rpx 16rpx 0 rgba(0, 0, 0, 0.4);
+        box-shadow: 0 0.21rem 0.42rem 0 rgba(0, 0, 0, 0.4);
     }
 
-    .shopCart .content .content-left .logo-wrapper .logo {
+    /* .shopCart .content .content-left .logo-wrapper .logo {
         width: 100%;
         height: 100%;
         text-align: center;
@@ -399,52 +448,53 @@
     }
 
     .shopCart .content .content-left .logo-wrapper .logo .icon-gouwuche {
-        line-height: 88rpx;
-        font-size: 48rpx;
+        line-height: 2.34rem;
+        font-size: 1.28rem;
         color: #80858a;
     }
 
     .shopCart .content .content-left .logo-wrapper .logo .icon-gouwuche.highlight {
         color: #fff;
-    }
+    } */
 
-    .shopCart .content .content-left .price {
+    /* .shopCart .content .content-left .price {
         display: inline-block;
         vertical-align: top;
-        margin-top: 24rpx;
-        line-height: 48rpx;
-        padding-right: 24rpx;
+        margin-top: 0.64rem;
+        line-height: 1.28rem;
+        padding-right: 0.64rem;
         box-sizing: border-box;
 
-        font-size: 32rpx;
+        font-size: 0.85rem;
         font-weight: 700;
         color: rgba(255, 255, 255, 0.4);
-    }
+    } */
 
-    .shopCart .content .content-left .price.highlight {
-        color: #fff;
+    .highlight {
+        color: #333333;
+        box-sizing: border-box;
     }
 
     .shopCart .content .content-left .desc {
         display: inline-block;
         vertical-align: top;
-        line-height: 48rpx;
-        margin-left: 24rpx;
-        margin-top: 24rpx;
+        line-height: 1.28rem;
+        margin-left: 0.64rem;
+        margin-top: 0.64rem;
         color: rgba(255, 255, 255, 0.4);
-        font-size: 20rpx;
+        font-size: 0.53rem;
     }
 
     .shopCart .content .content-right {
-        flex: 0 0 210rpx;
-        width: 210rpx;
+        flex: 0 0 5.6rem;
+        width: 5.6rem;
     }
 
     .shopCart .content .content-right .pay {
-        height: 96rpx;
-        line-height: 96rpx;
+        height: 2.56rem;
+        line-height: 2.56rem;
         text-align: center;
-        font-size: 24rpx;
+        font-size: 0.64rem;
         color: rgba(255, 255, 255, 0.4);
         font-weight: 700;
         background: #2b333b;
@@ -462,15 +512,15 @@
 
     .shopCart .ball-container .ball {
         position: fixed;
-        left: 64rpx;
-        bottom: 44rpx;
+        left: 1.75rem;
+        bottom: 1.17rem;
         z-index: 200;
         transition: all 0.6s cubic-bezier(0.49, -0.29, 0.75, 0.41);
     }
 
     .shopCart .ball-container .ball .inner {
-        width: 32rpx;
-        height: 32rpx;
+        width: 0.85rem;
+        height: 0.85rem;
         border-radius: 50%;
         background: rgb(0, 160, 220);
         transition: all 0.4s linear;
@@ -496,51 +546,51 @@
     }
 
     .shopCart .shopcart-list .list-header {
-        height: 80rpx;
-        line-height: 80rpx;
-        padding: 0 36rpx;
+        height: 2.13rem;
+        line-height: 2.13rem;
+        padding: 0 0.96rem;
         background: #f3f5f7;
         border-bottom: 2rpx solid rgba(7, 17, 27, 0.1);
     }
 
     .shopCart .shopcart-list .list-header .title {
         float: left;
-        font-size: 28rpx;
+        font-size: 0.74rem;
         color: rgb(7, 17, 27);
     }
 
     .shopCart .shopcart-list .list-header .empty {
         float: right;
-        font-size: 24rpx;
+        font-size: 0.64rem;
         color: rgb(0, 160, 220);
     }
 
     .shopCart .shopcart-list .list-content {
-        padding: 0 36rpx;
-        max-height: 434rpx;
+        padding: 0 0.95rem;
+        max-height: 11.57rem;
         overflow: hidden;
         background: #fff;
     }
 
     .shopCart .shopcart-list .list-content .shopcart-food {
         position: relative;
-        padding: 24rpx 0;
+        padding: 0.64rem 0;
         box-sizing: border-box;
         /*border-top: 1px solid rgba(7,17,27,0.1);*/
     }
 
     .shopCart .shopcart-list .list-content .shopcart-food .name {
-        line-height: 48rpx;
-        font-size: 28rpx;
+        line-height: 1.28rem;
+        font-size: 0.74rem;
         color: rgb(7, 17, 27);
     }
 
     .shopCart .shopcart-list .list-content .shopcart-food .price {
         position: absolute;
-        right: 180rpx;
-        bottom: 24rpx;
-        line-height: 48rpx;
-        font-size: 28rpx;
+        right: 4.8rem;
+        bottom: 0.64rem;
+        line-height: 1.28rem;
+        font-size: 0.74rem;
         font-weight: 700;
         color: rgb(240, 20, 20);
     }
@@ -548,6 +598,6 @@
     .shopCart .shopcart-list .list-content .shopcart-food .cartControl-wrapper {
         position: absolute;
         right: 0;
-        bottom: 12rpx;
+        bottom: 0.32rem;
     }
 </style>
