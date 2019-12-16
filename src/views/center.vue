@@ -17,7 +17,7 @@
                     <div class="menu-item-number">0</div>
                 </div>
             </div>
-            <div class="member-text">会员充值满100赠10</div>
+            <!-- <div class="member-text">会员充值满100赠10</div> -->
         </div>
         <div class="member-bottom">
             <div class="bottom-list">
@@ -34,15 +34,50 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
     export default {
-        name:'center',
+        name: 'center',
         data() {
             return {
-                
+                blance:'',
+
             }
         },
         beforeCreate() {
             document.querySelector('body').setAttribute('style', 'background:#f3f3f3')
+        },
+        created() {
+
+        },
+        methods: {
+            //获取用户信息
+            getUserInfo() {
+                // let shopId = 
+                // let openId = 
+                axios({
+                    url: '/api/vip/memberDetails',
+                    method: 'get',
+                    params: {
+                        shopId: 1,
+                        openId: 1,
+                        userId: ''
+                    },
+                    headers: {
+                        // Authorization: 'Bearer eyJ0eXAiABUg-Fxs...',
+                        Accept: 'application/json'
+                    }
+                }).then(res => {
+                    if (res.data.code == 200) {0
+                        // this.code = res.data.data;
+                        // Toast('登录成功');
+                        let user = res.data.data;
+                        this.blance = user.blance;
+                        this.vipScroe = user.vipScroe;
+                    }
+                }).catch(res1 => {
+                    console.log(res1, 'res1')
+                })
+            },
         },
 
     }
@@ -119,10 +154,10 @@
         flex-direction: column;
         font-size: 0.64rem;
         background-color: #fff;
-        margin-top: 0.53rem; 
+        margin-top: 0.53rem;
     }
 
-    .member-bottom{ 
+    .member-bottom {
         width: 100%;
         /* height: 16.29rem; */
         /* background-color: #f3f3f3; */

@@ -5,7 +5,9 @@ import order from '@/views/order'
 import cart from '@/views/cart'
 import schedule from '@/views/schedule'
 import form from '@/views/form'
+import details from '@/views/details'
 import register from '@/views/register'
+import coupon from '@/views/coupon'
 Vue.use(Router)
 /**
  * 重写路由的push方法
@@ -16,6 +18,22 @@ Router.prototype.push = function push(location) {
 }
 export default new Router({
 routes: [
+    {
+        path: '/',
+        name: 'coupon',
+        component: coupon,
+        meta: {
+        title: '会员详情'
+        }
+    },
+    {
+        path: '/',
+        name: 'details',
+        component: details,
+        meta: {
+        title: '会员详情'
+        }
+    },
     {
         path: '/',
         name: 'register',
